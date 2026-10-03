@@ -1,0 +1,6 @@
+AWS SDK for Ruby
+Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+This package is a port of the aws-eventstream gem 1.4.0 to Spinel. The
+files under aws-eventstream/ were copied from the gem and modified where
+they say "# spinel:"; see the README for each change.

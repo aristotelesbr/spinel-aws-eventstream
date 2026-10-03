@@ -1,0 +1,16 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    aws-eventstream (1.4.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  aws-eventstream (= 1.4.0)
+
+CHECKSUMS
+  aws-eventstream (1.4.0) sha256=116bf85c436200d1060811e6f5d2d40c88f65448f2125bc77ffce5121e6e183b
+
+BUNDLED WITH
+  4.0.9

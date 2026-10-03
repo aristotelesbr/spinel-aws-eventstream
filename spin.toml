@@ -1,0 +1,3 @@
+[package]
+name = "aws-eventstream"
+version = "0.1.0"
