@@ -112,7 +112,9 @@ module Aws
       #   and boolean pair, the boolean flag indicates whether this chunk
       #   has been fully consumed, unused data is tracked at #message_buffer
       def decode_chunk(chunk = nil)
-        @message_buffer = [@message_buffer, chunk].pack('a*a*') if chunk
+        # spinel-aws-eventstream: workaround for matz/spinel#7250 (pack cuts a
+        # String at its first NUL); remove when merged.
+        @message_buffer = [@message_buffer, chunk].map(&:b).join if chunk
         decode_message(@message_buffer)
       end
 
@@ -140,7 +142,9 @@ module Aws
         return [nil, true] if raw_message.bytesize < total_length
 
         content, checksum, remaining = content.unpack("a#{total_length - PRELUDE_LENGTH - CRC32_LENGTH}Na*")
-        unless Zlib.crc32([prelude, content].pack('a*a*')) == checksum
+        # spinel-aws-eventstream: workaround for matz/spinel#7250 (pack cuts a
+        # String at its first NUL); remove when merged.
+        unless Zlib.crc32([prelude, content].map(&:b).join) == checksum
           raise Errors::MessageChecksumError
         end
 

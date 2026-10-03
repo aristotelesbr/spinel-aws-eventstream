@@ -1,0 +1,26 @@
+all_headers: 204 bytes, eof=true
+  bool false (bool_false) = false
+  bool true (bool_true) = true
+  byte (byte) = -49
+  byte buf (bytes) = "I'm a little teapot!"
+  content-type (string) = "application/json"
+  event-type (integer) = 40972
+  int16 (short) = 42
+  int64 (long) = 42424242
+  timestamp (timestamp) = 8675309
+  uuid (uuid) = "\x01\x02\x03\x04\x05\x06\a\b\t\n\v\f\r\x0E\x0F\x10"
+  payload = "{'foo':'bar'}"
+empty_message: 16 bytes, eof=true
+  payload = ""
+int32_header: 45 bytes, eof=true
+  event-type (integer) = 40972
+  payload = "{'foo':'bar'}"
+payload_no_headers: 29 bytes, eof=true
+  payload = "{'foo':'bar'}"
+payload_one_str_header: 61 bytes, eof=true
+  content-type (string) = "application/json"
+  payload = "{'foo':'bar'}"
+corrupted_header_len: Aws::EventStream::Errors::PreludeChecksumError: Prelude checksum mismatch
+corrupted_headers: Aws::EventStream::Errors::MessageChecksumError: Message checksum mismatch
+corrupted_length: Aws::EventStream::Errors::PreludeChecksumError: Prelude checksum mismatch
+corrupted_payload: Aws::EventStream::Errors::MessageChecksumError: Message checksum mismatch

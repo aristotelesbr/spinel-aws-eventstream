@@ -1,0 +1,8 @@
+event-type {'foo':'bar'} eof=false
+content-type {'foo':'bar'} eof=true
+nil eof=true
+nil eof=true
+event-type {'foo':'bar'} eof=true
+nil eof=true
+event-type {'foo':'bar'} eof=false
+content-type {'foo':'bar'} eof=true
