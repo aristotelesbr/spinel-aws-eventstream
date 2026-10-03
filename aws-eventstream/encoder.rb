@@ -121,14 +121,22 @@ module Aws
           pattern, value_length, type_index = Types.pattern[value.type]
           encoded_value = [type_index].pack('C')
           # boolean types doesn't need to specify value
-          next [encoded_key, encoded_value].map(&:b).join if !!pattern == pattern
-          encoded_value = [encoded_value, [value.value.bytesize].pack('S>')].map(&:b).join unless value_length
+          # spinel-aws-eventstream: if/else instead of the gem's
+          # `next [..] if !!pattern == pattern`, which under Spinel encoded each
+          # boolean header as nothing (no upstream issue yet; see the README).
+          # Restore the gem's form once Spinel is fixed and
+          # test/bool_headers_test.rb still passes.
+          if !!pattern == pattern
+            [encoded_key, encoded_value].map(&:b).join
+          else
+            encoded_value = [encoded_value, [value.value.bytesize].pack('S>')].map(&:b).join unless value_length
 
-          [
-            encoded_key,
-            encoded_value,
-            pattern ? [value.value].pack(pattern) : value.value,
-          ].map(&:b).join
+            [
+              encoded_key,
+              encoded_value,
+              pattern ? [value.value].pack(pattern) : value.value,
+            ].map(&:b).join
+          end
         end
         header_entries.join.tap do |encoded_header|
           break encoded_header if encoded_header.bytesize <= MAX_HEADERS_LENGTH
