@@ -46,6 +46,9 @@ sh oracle/run.sh           # the real gem and this package under CRuby 4.0.2
 sh oracle/run.sh --write   # regenerate .expected from the real gem
 ```
 
+The oracle needs [mise](https://mise.jdx.dev) with Ruby 4.0.2 and the gem
+installed once: `cd oracle && BUNDLE_GEMFILE=$PWD/Gemfile mise exec ruby@4.0.2 -- bundle install`.
+
 Every `.expected` is the real gem's output. The fixtures in `test/fixtures`
 are the official ones from aws-sdk-ruby (see `UPSTREAM`). Tested with
 Spinel `3d541fc87`.
