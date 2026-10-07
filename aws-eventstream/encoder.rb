@@ -91,17 +91,14 @@ module Aws
         encoded_prelude = encode_prelude(total_length, header_length)
 
         # append message context (headers, payload)
-        # spinel-aws-eventstream: workaround for matz/spinel#7250 (pack cuts a
-        # String at its first NUL); remove when merged.
-        # It also covers the checksum join at the end of this method.
         encoded_content = [
           encoded_prelude,
           encoded_header,
           encoded_payload,
-        ].map(&:b).join
+        ].pack('a*a*a*')
         # append message checksum
         message_checksum = Zlib.crc32(encoded_content)
-        [encoded_content, [message_checksum].pack('N')].map(&:b).join
+        [encoded_content, message_checksum].pack('a*N')
       end
 
       # Encodes headers part of an Aws::EventStream::Message
@@ -112,31 +109,20 @@ module Aws
       # @return [String]
       def encode_headers(message)
         header_entries = message.headers.map do |key, value|
-          # spinel-aws-eventstream: workaround for matz/spinel#7250 (pack cuts
-          # a String at its first NUL); remove when merged. The same applies
-          # to every join in this block.
-          encoded_key = [[key.bytesize].pack('C'), key].map(&:b).join
+          encoded_key = [key.bytesize, key].pack('Ca*')
 
           # header value
           pattern, value_length, type_index = Types.pattern[value.type]
           encoded_value = [type_index].pack('C')
           # boolean types doesn't need to specify value
-          # spinel-aws-eventstream: if/else instead of the gem's
-          # `next [..] if !!pattern == pattern`, which under Spinel encoded each
-          # boolean header as nothing (no upstream issue yet; see the README).
-          # Restore the gem's form once Spinel is fixed and
-          # test/bool_headers_test.rb still passes.
-          if !!pattern == pattern
-            [encoded_key, encoded_value].map(&:b).join
-          else
-            encoded_value = [encoded_value, [value.value.bytesize].pack('S>')].map(&:b).join unless value_length
+          next [encoded_key, encoded_value].pack('a*a*') if !!pattern == pattern
+          encoded_value = [encoded_value, value.value.bytesize].pack('a*S>') unless value_length
 
-            [
-              encoded_key,
-              encoded_value,
-              pattern ? [value.value].pack(pattern) : value.value,
-            ].map(&:b).join
-          end
+          [
+            encoded_key,
+            encoded_value,
+            pattern ? [value.value].pack(pattern) : value.value,
+          ].pack('a*a*a*')
         end
         header_entries.join.tap do |encoded_header|
           break encoded_header if encoded_header.bytesize <= MAX_HEADERS_LENGTH
@@ -149,9 +135,7 @@ module Aws
       def encode_prelude(total_length, headers_length)
         prelude_body = [total_length, headers_length].pack('NN')
         checksum = Zlib.crc32(prelude_body)
-        # spinel-aws-eventstream: workaround for matz/spinel#7250 (pack cuts a
-        # String at its first NUL); remove when merged.
-        [prelude_body, [checksum].pack('N')].map(&:b).join
+        [prelude_body, checksum].pack('a*N')
       end
     end
   end

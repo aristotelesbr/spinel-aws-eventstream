@@ -2,10 +2,8 @@
 
 The [aws-eventstream](https://rubygems.org/gems/aws-eventstream) gem for
 Spinel: the AWS event-stream message encoder and decoder. This is the
-**gem's own source**, aws-eventstream 1.4.0, with rewrites only where
-Spinel cannot run it as is, and every rewrite marked
-`# spinel-aws-eventstream:` in place. `require "aws-eventstream"` and the
-names are the gem's.
+**gem's own source**, aws-eventstream 1.4.0, unchanged.
+`require "aws-eventstream"` and the names are the gem's.
 
 ```ruby
 require "aws-eventstream"
@@ -20,15 +18,14 @@ decoded, eof = Aws::EventStream::Decoder.new(format: false).decode_chunk(bytes)
 decoded.payload.read   # => "hello"
 ```
 
-## What was rewritten, and why
+## No rewrites
 
-`git diff` against the commit "Add the aws-eventstream gem 1.4.0 lib/
-verbatim" shows every change. There are two kinds:
-
-| Where | The gem | Here | Why | Remove when |
-|---|---|---|---|---|
-| `decoder.rb` (2), `encoder.rb` (every join) | `[...].pack('a*...')` | `[...].map(&:b).join`, numbers packed first | Spinel cuts a String at its first NUL there | matz/spinel#7250 is merged |
-| `encoder.rb`, `encode_headers` | `next ... if` for boolean headers | `if`/`else` | each boolean header was encoded as nothing (no upstream issue yet) | Spinel is fixed and `test/bool_headers_test.rb` passes with the gem's form |
+The code under `aws-eventstream/` is the gem's lib/ byte for byte (compare
+with the commit "Add the aws-eventstream gem 1.4.0 lib/ verbatim"). Version
+0.1.0 carried two rewrites, for a `pack` that cut a String at its first NUL
+(matz/spinel#7250) and for boolean headers encoded as nothing; Spinel
+master fixed both, so 0.1.1 dropped them and needs a Spinel from
+`5c78f07e5` (2026-10-07) or later.
 
 ## Known gaps
 
@@ -51,7 +48,7 @@ installed once: `cd oracle && BUNDLE_GEMFILE=$PWD/Gemfile mise exec ruby@4.0.2 -
 
 Every `.expected` is the real gem's output. The fixtures in `test/fixtures`
 are the official ones from aws-sdk-ruby (see `UPSTREAM`). Tested with
-Spinel `3d541fc87`.
+Spinel `5c78f07e5`.
 
 ## License
 
