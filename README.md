@@ -51,7 +51,7 @@ Every `.expected` is the real gem's output. The fixtures in `test/fixtures`
 are the official ones from aws-sdk-ruby (see `UPSTREAM`). Tested with
 Spinel `165974895`.
 
-`.github/workflows/test.yml` runs both on every push against that Spinel
+`.github/workflows/test.yml` runs both on Linux and macOS on every push against that Spinel
 revision, and every day against Spinel master.
 
 ## License
