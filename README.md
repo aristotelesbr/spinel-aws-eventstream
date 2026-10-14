@@ -48,7 +48,7 @@ installed once: `cd oracle && BUNDLE_GEMFILE=$PWD/Gemfile mise exec ruby@4.0.2 -
 
 Every `.expected` is the real gem's output. The fixtures in `test/fixtures`
 are the official ones from aws-sdk-ruby (see `UPSTREAM`). Tested with
-Spinel `5c78f07e5`.
+Spinel `5294fcba7`.
 
 ## License
 
