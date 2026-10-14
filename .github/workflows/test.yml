@@ -30,11 +30,12 @@ jobs:
           fi
           echo "revision=$revision" >> "$GITHUB_OUTPUT"
 
+      # Outside the checkout, or spin test would take Spinel's own sources as the package's
       - name: Restore Spinel
         id: spinel-cache
         uses: actions/cache@v4
         with:
-          path: spinel-toolchain
+          path: ~/spinel-toolchain
           key: spinel-${{ runner.os }}-${{ runner.arch }}-${{ steps.spinel.outputs.revision }}
 
       - name: Build Spinel
@@ -42,13 +43,13 @@ jobs:
         env:
           REVISION: ${{ steps.spinel.outputs.revision }}
         run: |
-          git clone --filter=blob:none https://github.com/matz/spinel spinel-toolchain
-          cd spinel-toolchain
+          git clone --filter=blob:none https://github.com/matz/spinel ~/spinel-toolchain
+          cd ~/spinel-toolchain
           git checkout --quiet "$REVISION"
           make deps
           make -j"$(nproc)"
 
-      - run: echo "$GITHUB_WORKSPACE/spinel-toolchain/bin" >> "$GITHUB_PATH"
+      - run: echo "$HOME/spinel-toolchain/bin" >> "$GITHUB_PATH"
 
       - name: Spin test
         run: spin test
