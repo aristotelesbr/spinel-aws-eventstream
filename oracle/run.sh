@@ -3,11 +3,15 @@
 # .expected: once with the real aws-eventstream gem (the oracle) and once with
 # this package. With --write, regenerates every .expected from the real gem.
 # A run counts only if ruby exits 0; stdout alone is compared.
+# RUBY names the ruby to run (default: Ruby 4.0.2 through mise).
 set -eu
 CDPATH= cd "$(dirname "$0")/.."
 export BUNDLE_GEMFILE="$PWD/oracle/Gemfile"
-ruby_gem() { mise exec ruby@4.0.2 -- bundle exec ruby "$1"; }
-ruby_pkg() { mise exec ruby@4.0.2 -- ruby --disable-gems -I . "$1"; }
+cruby() {
+  if [ -n "${RUBY:-}" ]; then "$RUBY" "$@"; else mise exec ruby@4.0.2 -- ruby "$@"; fi
+}
+ruby_gem() { cruby -rbundler/setup "$1"; }
+ruby_pkg() { cruby --disable-gems -I . "$1"; }
 
 tmp=$(mktemp)
 trap 'rm -f "$tmp"' EXIT
